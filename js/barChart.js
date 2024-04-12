@@ -4,9 +4,8 @@ class BarChart {
      * class constructor with basic chart configuration
      * @param {Object} _config 
      * @param {Array} _data 
-     * @param {d3.Scale} _colorScale 
      */
-    constructor(_config, _data, _colorScale) {
+    constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
             containerWidth: _config.containerWidth || 500,
@@ -14,13 +13,16 @@ class BarChart {
             margin: _config.margin || {top: 5, right: 5, bottom: 20, left: 50}
         };
         this.data = _data;
-        this.colorScale = _colorScale;
+        this.colorScale= d3.scaleOrdinal(d3.schemeCategory10);
+        
+        const targetAreas = ["United States of America", "Germany", "China", "India", "Brazil", "Egypt"];
+        this.data = this.data.filter(obj => targetAreas.includes(obj.Area));
         this.initVis();
+        this.updateVis();
     }
-
+    
     initVis() {
         let vis = this;
-        
 
         vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
         vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
@@ -33,46 +35,103 @@ class BarChart {
         
         vis.chart = vis.svg.append('g')
             .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
+        
+        vis.xScale = d3.scaleBand()
+            .range([0, vis.width])
+            .paddingInner(0.2);
+        
+        vis.yScale = d3.scaleLinear()
+            .range([vis.height, 0]); 
+
+        vis.xAxis = d3.axisBottom(vis.xScale)
+            .tickSizeOuter(0);
+
+        vis.yAxis = d3.axisLeft(vis.yScale)
+            .ticks(6)
+            .tickSizeOuter(0);
+
+        vis.xAxisG = vis.chart.append('g')
+            .attr('class', 'axis x-axis')
+            .attr('transform', `translate(0,${vis.height})`);
+
+        vis.yAxisG = vis.chart.append('g')
+            .attr('class', 'axis y-axis');
+
+        vis.svg.append('text')
+            .attr('class', 'axis-title')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('dy', '.71em')
+
+    }
+
+    updateVis() {
+       let vis =this;
+       vis.array =[];
+       var data1={};
+       
+       const uniqueAreas = [...new Set(vis.data.map(obj => obj.Area))];
+       console.log(uniqueAreas);
+
+       for(let i=0; i<uniqueAreas.length;i++){
+           let agriWasteAvg=0;
+           let riceProdAvg=0;
+           let foodProcesAvg=0;
+           let pesticideAvg=0;
+            let countryCount =0;
+
+            vis.data.forEach(function(obj){
+                if (obj.Area === uniqueAreas[i]) {
+
+                    agriWasteAvg+=parseFloat(obj["Agrifood Systems Waste Disposal"]);
+                    riceProdAvg += parseFloat(obj["Rice Cultivation"]);
+                    foodProcesAvg+=parseFloat(obj["Food Processing"]);
+                    pesticideAvg+=parseInt(obj["Pesticides Manufacturing"]);
+
+                    countryCount+=1;
+                };
+            });
+            data1={Area : uniqueAreas[i], agriWaste : agriWasteAvg/countryCount, riceProd : riceProdAvg/countryCount, 
+                    foodProces : foodProcesAvg/countryCount, pesticide : pesticideAvg/countryCount};
+            vis.array.push(data1);
 
         }
-    updateVis() {
-        let vis = this;
-        const speciesCounts = d3.rollups(
-            data, 
-            v => v.length, 
-            d => d.species 
-        );
-        
-        // Extracting species labels and counts from the rollup result
-        const speciesLabels = speciesCounts.map(d => d[0]);
-        const speciesCountsValues = speciesCounts.map(d => d[1]);
+        console.log(vis.array);
 
-        // Update scales with actual data
-        
-        vis.xScale.domain(speciesLabels);
-        
-        vis.yScale.domain([0, d3.max(speciesCountsValues)]);
-        console.log(vis)
+        vis.x = d3.scaleBand()
+            .range([0, vis.width])
+            .padding(0.4);
+
+        vis.y = d3.scaleLinear()
+            .range([vis.height, 0]);
+            vis.colorScale.domain(vis.array.map(function(d) { return d.Area; }))
+        vis.xScale.domain(vis.array.map(function(d, i) {return d.Area; }));
+        vis.yScale.domain([0, d3.max(vis.array, function(d) { return d.riceProd; })]);
+
         vis.renderVis();
+
     }
-    renderVis(x,y) {
-       
+    renderVis() {
         let vis = this;
 
         // Add bars
         vis.chart.selectAll('.bar')
-            .data(vis.data)
+            .data(vis.array)
             .enter()
             .append('rect')
             .attr('class', 'bar')
-            .attr('x', d => vis.xScale(d[0]))
-            .attr('y', d => vis.yScale(d[1]))
+            .attr('x', (function(d) { return vis.xScale(d.Area); }))
+            .attr('y', (function(d) { return vis.yScale(d.riceProd); }))
             .attr('width', vis.xScale.bandwidth())
-            .attr('height', d => vis.height - vis.yScale(d[1]))
-            .attr('fill', 'steelblue')
+            .attr('height', d => vis.height - vis.yScale(d.riceProd))
+            .attr('fill', function(d) { return vis.colorScale(d.director); })
            
-            .on('mouseover', function() {
-                d3.select(this).attr('stroke-width', '2px');
+            .on('mouseover', function(event, d) {
+                d3.selectAll('.line')
+                .style('stroke-opacity', lineData => lineData.Area === d.key ? 1 : 0.1);
+                d3.select(this).attr('stroke', 'black') 
+                .attr('stroke-width', 2); 
+    
             })
             .on('mouseout', function() {
                 d3.select(this).attr('stroke-width', '0px');
@@ -82,5 +141,6 @@ class BarChart {
         vis.xAxisG.call(vis.xAxis);
         vis.yAxisG.call(vis.yAxis);
     }
+       
 
 }

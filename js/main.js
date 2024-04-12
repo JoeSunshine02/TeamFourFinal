@@ -8,7 +8,8 @@ d3.csv('data/Agrofood_co2_emission.csv').then(_data => {
     });
      
 
-    console.log("reading csv")
+   // console.log(data)
+
     barchart = new BarChart({ parentElement: ".bar-chart" }, data);
     linechart = new LineChart({ parentElement: ".line-chart" }, data);
 
