@@ -144,3 +144,9 @@ class BarChart {
        
 
 }
+
+/*
+vis.yScale.domain([0, d3.max(vis.data, d => {
+            return d3.max(parameters, parameter => d[parameter]);
+        })]);
+*/

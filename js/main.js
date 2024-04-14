@@ -15,8 +15,11 @@ d3.csv('data/Agrofood_co2_emission.csv').then(_data => {
         d["Forest fires"] = parseFloat(d["Pesticides Manufacturing"]);
         d["Rice Cultivation"] = parseFloat(d["Rice Cultivation"]);
         d.Year = parseFloat(d.Year);
+        d.rent = +d['Rural population'];
+        d.insurance = +d['Urban population'];
     });
-     
+
+    const colorScale = d3.scaleOrdinal(d3.schemeCategory10); // initialize color scale based on city name
 
    // console.log(data)
 
@@ -25,6 +28,9 @@ d3.csv('data/Agrofood_co2_emission.csv').then(_data => {
 
     multiLineChart.updateVis(["Pesticides Manufacturing","Crop Residues","Fertilizers Manufacturing",
                             "Savanna fires","Rice Cultivation"]);
+
+    scatterplot = new ScatterPlot({parentElement: '#scatterplot'}, data, colorScale);
+    scatterplot.updateVis();
     //linechart = new LineChart({ parentElement: ".line-chart" }, data);
 })
 
