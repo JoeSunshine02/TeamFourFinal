@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Filter data to include only specific countries
         const specifiedCountries = ['Brazil', 'China', 'Egypt', 'Germany', 'India', 'United States of America'];
         const filteredData = _data.filter(d => specifiedCountries.includes(d.Area));
+        console.log(filteredData);
 
         // Populate dropdown with specified countries
         const dropdown = document.getElementById('country-selector');
