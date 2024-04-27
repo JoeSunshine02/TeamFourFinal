@@ -8,7 +8,7 @@ class BarChart {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: _config.containerWidth || 600,
+            containerWidth: _config.containerWidth || 900,
             containerHeight: _config.containerHeight || 200,
             margin: _config.margin || {top: 5, right: 5, bottom: 20, left: 50}
         };
@@ -25,6 +25,7 @@ class BarChart {
         let vis = this;
 
         vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
+        console.log(vis.width);
         vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
 
         vis.svg = d3.select(vis.config.parentElement)
@@ -102,11 +103,11 @@ class BarChart {
         vis.x = d3.scaleBand()
             .domain(vis.array.map(function (d) { return d.Area; }))
             .range([0, vis.width])
-            .padding(0.4);
+            .padding(0.1);
 
         vis.y = d3.scaleLinear()
             .domain([0, d3.max(vis.array, function (d) { return d3.max([d.agriWaste, d.riceProd, d.foodProces, d.pesticide]); })])
-            .nice()
+            //.nice()
             .range([vis.height, 0]);
 
         vis.colorScale.domain(vis.array.map(function(d) { return d.Area; }));
@@ -120,39 +121,52 @@ class BarChart {
         let vis = this;
 
         // Add bars
-    
-        vis.chart.selectAll('.bar')
-            .data(vis.array)
-            .enter()
-            //.join g
-            //.attr.transform(d,i)(i*20)
+        var categories = ["agriWaste", "riceProd", "foodProces", "pesticide"];
+        console.log(vis.x.bandwidth());
+        categories.forEach(function (category, i) {
+            vis.svg.selectAll(".bar-" + category)
+                .data(vis.array)
+                .enter().append("rect")
+                .attr("class", "bar bar-" + category)
+                .attr('x', function (d) { return vis.x(d.Area) + vis.x.bandwidth() / 4 * (i + 1.5); })
+                .attr("y", function (d) { return vis.y(d[category]); })
+                .attr("width", vis.x.bandwidth() / 4)
+                .attr("height", function (d) { return vis.height - vis.y(d[category]); })
+                .attr("fill", vis.colorScale(category))
 
-            //x change for positoon
-            //y change for bar
-            //width stays the same
-            //hight is based on the y
-            //change attr x (d.Area)
-            .append('rect')
-            .attr('class', 'bar')
-            .attr('x', (function(d) { return vis.xScale(d.Area); }))
-            .attr('y', (function(d) { return vis.yScale(d.riceProd); }))
-            //copy paset and update x position
-            .attr('width', vis.xScale.bandwidth())
-            .attr('height', d => vis.height - vis.yScale(d.riceProd))
-            .attr('fill', function(d) { return vis.colorScale(d.director); })
-           
-            .on('mouseover', function(event, d) {
-                d3.selectAll('.line')
-                .style('stroke-opacity', lineData => lineData.Area === d.key ? 1 : 0.1);
-                d3.select(this).attr('stroke', 'black') 
-                .attr('stroke-width', 2); 
-    
-            })
-            .on('mouseout', function() {
-                d3.select(this).attr('stroke-width', '0px');
+                .on('mouseover', function(event, d) {
+                    d3.selectAll('.line')
+                    .style('stroke-opacity', lineData => lineData.Area === d.key ? 1 : 0.1);
+                    d3.select(this).attr('stroke', 'black') 
+                    .attr('stroke-width', 2); 
+        
+                })
+                .on('mouseout', function() {
+                    d3.select(this).attr('stroke-width', '0px');
+                });
+        });
+        var legend = vis.svg.selectAll(".legend")
+            .data(categories)
+            .enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", function(d, i) { 
+                return "translate(" + (vis.width + -40) + "," + (vis.config.margin.top + i * 20+5) + ")"; 
             });
 
-        // Update axes
+        legend.append("rect")
+            .attr("x", 0)
+            .attr("y", -10)
+            .attr("width", 10)
+            .attr("height", 10)
+            .style("fill", function(d) { return vis.colorScale(d); });
+
+        legend.append("text")
+            .attr("x", 15)
+            .attr("y", 0)
+            .attr("dy", ".35em")
+            .text(function(d) { return d; });
+
+
         vis.xAxisG.call(vis.xAxis);
         vis.yAxisG.call(vis.yAxis);
     }
