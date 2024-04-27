@@ -8,8 +8,8 @@ class BarChart {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: _config.containerWidth || 500,
-            containerHeight: _config.containerHeight || 140,
+            containerWidth: _config.containerWidth || 600,
+            containerHeight: _config.containerHeight || 200,
             margin: _config.margin || {top: 5, right: 5, bottom: 20, left: 50}
         };
         this.data = _data;
@@ -96,17 +96,22 @@ class BarChart {
             vis.array.push(data1);
 
         }
+        console.log(data1);
         console.log(vis.array);
 
         vis.x = d3.scaleBand()
+            .domain(vis.array.map(function (d) { return d.Area; }))
             .range([0, vis.width])
             .padding(0.4);
 
         vis.y = d3.scaleLinear()
+            .domain([0, d3.max(vis.array, function (d) { return d3.max([d.agriWaste, d.riceProd, d.foodProces, d.pesticide]); })])
+            .nice()
             .range([vis.height, 0]);
-            vis.colorScale.domain(vis.array.map(function(d) { return d.Area; }))
+
+        vis.colorScale.domain(vis.array.map(function(d) { return d.Area; }));
         vis.xScale.domain(vis.array.map(function(d, i) {return d.Area; }));
-        vis.yScale.domain([0, d3.max(vis.array, function(d) { return d.riceProd; })]);
+       // vis.yScale.domain([0, d3.max(vis.array, function(d) { return d.riceProd; })]);
 
         vis.renderVis();
 
@@ -115,13 +120,23 @@ class BarChart {
         let vis = this;
 
         // Add bars
+    
         vis.chart.selectAll('.bar')
             .data(vis.array)
             .enter()
+            //.join g
+            //.attr.transform(d,i)(i*20)
+
+            //x change for positoon
+            //y change for bar
+            //width stays the same
+            //hight is based on the y
+            //change attr x (d.Area)
             .append('rect')
             .attr('class', 'bar')
             .attr('x', (function(d) { return vis.xScale(d.Area); }))
             .attr('y', (function(d) { return vis.yScale(d.riceProd); }))
+            //copy paset and update x position
             .attr('width', vis.xScale.bandwidth())
             .attr('height', d => vis.height - vis.yScale(d.riceProd))
             .attr('fill', function(d) { return vis.colorScale(d.director); })

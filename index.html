@@ -8,14 +8,27 @@
 </head>
 <body>
     <h1>C02 producers by nation.</h1>
-    <div class="container">
-        <!-- Todo: add a title for the dashboard using h1 tag -->
 
-       <!-- Todo: add visualizations -->
-       <div class = "line-chart"></div>
-       <div class="bar-chart"></div>
-       <div id="scatterplot"></div>
+    
+
+    <div class="container">
+        <div class="left-column">
+            <!-- Dropdown for selecting the country -->
+            <div style="text-align: center; margin-bottom: 20px;">
+                <label for="country-selector">Select Country:</label>
+                <select id="country-selector" style="margin-left: 10px;"></select>
+            </div>
+            <h1 style="text-align: center;">CO2 Emissions Dashboard</h1>
+            <!-- Todo: add a title for the dashboard using h1 tag -->
+            <div id="lineChart" style="width: 960px; height: 500px; margin: auto;"></div>
+            <div id="tooltip" class="tooltip" style="opacity: 0;"></div>
+            <div class="bar-chart"></div>
+        </div>
+        <div class="right-column">
+            <div class="scatterplot"></div>
+        </div>
    </div>
+   
 
     <div class="div-tooltip"></div>
     <div class="div-control"></div>

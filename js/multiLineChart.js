@@ -1,20 +1,13 @@
 class MultiLineChart {
-
-    /**
-     * class constructor with basic chart configuration
-     * @param {Object} _config 
-     * @param {Array} _data 
-     */
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: _config.containerWidth || 800,
-            containerHeight: _config.containerHeight || 400,
+            containerWidth: _config.containerWidth || 960,
+            containerHeight: _config.containerHeight || 500,
             margin: _config.margin || { top: 50, right: 50, bottom: 50, left: 50 }
         };
-        this.data = _data;
-        const targetAreas = ["United States of America"];
-        this.data = this.data.filter(obj => targetAreas.includes(obj.Area));
+        this.fullData = _data;
+        this.data = [];
         this.initVis();
     }
 
@@ -32,9 +25,8 @@ class MultiLineChart {
         vis.chartG = vis.svg.append('g')
             .attr('transform', `translate(${vis.config.margin.left}, ${vis.config.margin.top})`);
 
-            vis.xScale = d3.scaleBand()
-            .range([0, vis.width])
-            .padding(0.3); // Some initial padding; /// Adjust padding here
+        vis.xScale = d3.scaleTime()
+            .range([0, vis.width]);
 
         vis.yScale = d3.scaleLinear()
             .range([vis.height, 0]);
@@ -51,56 +43,48 @@ class MultiLineChart {
         vis.yAxisG = vis.chartG.append('g')
             .attr('class', 'axis y-axis');
 
-        // Add x-axis label
-        vis.svg.append("text")
-            .attr("transform", `translate(${vis.width / 2}, ${vis.height + vis.config.margin.top + 40})`)
-            .style("text-anchor", "middle")
-            .text("Year");
-
-        // Add y-axis label
-        vis.svg.append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 0)
-            .attr("x", 0 - (vis.height/2))
-            .attr("dy", "1em")
-            .style("text-anchor", "middle")
-            .text("Value");
-
         vis.marksG = vis.chartG.append('g');
     }
 
+  
     updateVis(parameters) {
         let vis = this;
-
+    
         // Update scales
-        vis.xScale.domain(vis.data.map(d => d.Year));
-        vis.yScale.domain([0, d3.max(vis.data, d => {
-            return d3.max(parameters, parameter => d[parameter]);
-        })]);
+        vis.xScale.domain(d3.extent(vis.data, d => d.Year));
+        vis.yScale.domain([0, d3.max(vis.data, d => d3.max(parameters, parameter => d[parameter]))]);
         vis.colorScale.domain(parameters);
-
+    
         // Update axes
         vis.xAxisG.transition().call(vis.xAxis);
         vis.yAxisG.transition().call(vis.yAxis);
+    
+        // Bind data
+        const lines = vis.marksG.selectAll('.line')
+            .data(parameters);
+    
+        // Enter & update
+        lines.enter().append('path')
+            .attr('class', 'line')
+            .merge(lines)
+            .transition()
+            .attr('fill', 'none')
+            .attr('stroke', d => vis.colorScale(d))
+            .attr('stroke-width', 1.5)
+            .attr('d', d => {
+                const line = d3.line()
+                    .x(data => vis.xScale(data.Year))
+                    .y(data => vis.yScale(data[d]));
+                return line(vis.data);
+            });
+    
+        // Exit
+        lines.exit().remove();
+    
+    }
 
-        // Update lines
-        parameters.forEach(parameter => {
-            const line = d3.line()
-                .x(d => vis.xScale(d.Year))
-                .y(d => vis.yScale(d[parameter]));
-
-            let path = vis.marksG.selectAll(`.line-${parameter}`)
-                .data([vis.data]);
-
-            path.enter().append('path')
-                .attr('class', `line line-${parameter}`)
-                .merge(path)
-                .attr('fill', 'none')
-                .attr('stroke', vis.colorScale(parameter))
-                .attr('stroke-width', 1.5)
-                .attr('d', line);
-
-            path.exit().remove();
-        });
+    filterDataByCountry(country) {
+        this.data = this.fullData.filter(d => d.Area === country);
+        this.updateVis(["Savanna fires", "Forest fires", "Crop Residues", "Rice Cultivation", "Pesticides Manufacturing"]);
     }
 }
