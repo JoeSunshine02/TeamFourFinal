@@ -141,10 +141,12 @@ class BarChart {
                     .attr('stroke-width', 2); 
         
                 })
+               
                 .on('mouseout', function() {
                     d3.select(this).attr('stroke-width', '0px');
                 });
         });
+       
         var legend = vis.svg.selectAll(".legend")
             .data(categories)
             .enter().append("g")

@@ -64,7 +64,7 @@ class MultiLineChart {
             .data(parameters);
     
         // Enter & update
-        lines.enter().append('path')
+        const lineGenerator = lines.enter().append('path')
             .attr('class', 'line')
             .merge(lines)
             .transition()
@@ -76,7 +76,22 @@ class MultiLineChart {
                     .x(data => vis.xScale(data.Year))
                     .y(data => vis.yScale(data[d]));
                 return line(vis.data);
-            });
+            })
+            lineGenerator
+    .on('mouseover', (event, d) => {
+        d3.select(event.currentTarget)
+          .transition()
+          .duration(150)
+          .attr('stroke-width', 3)
+          .attr('stroke', d3.rgb(vis.colorScale(d)).brighter(0.5));
+    })
+    .on('mouseout', (event, d) => {
+        d3.select(event.currentTarget)
+          .transition()
+          .duration(150)
+          .attr('stroke-width', 1.5)
+          .attr('stroke', d => vis.colorScale(d));
+    });
     
         // Exit
         lines.exit().remove();

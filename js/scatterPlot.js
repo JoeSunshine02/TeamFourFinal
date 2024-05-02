@@ -12,6 +12,7 @@ class ScatterPlot {
         const targetAreas = ["United States of America", "Germany", "China", "India", "Brazil", "Egypt"];
         this.data = this.data.filter(obj => targetAreas.includes(obj.Area));
         console.log(this.data);
+        this.currentAttribute = 'Urban population';
         this.initVis();
         this.updateVis();
     }
@@ -43,7 +44,16 @@ class ScatterPlot {
         vis.yAxisG = vis.chart.append('g').attr('class', 'axis y-axis');
 
         vis.svg.append('text').attr('class', 'axis-title').attr('x', 0).attr('y', 25).attr('dy', '0.71em').text('Rural Population');
-        vis.chart.append('text').attr('class', 'axis-title').attr('x', vis.width).attr('y', vis.height - 15).attr('dy', '0.71em').style('text-anchor', 'end').text('Urban Population');
+        vis.chart.append('text').attr('class', 'axis-title').attr('x', vis.width).attr('y', vis.height - 15).attr('dy', '0.71em').style('text-anchor', 'end').text('selected attribute');
+        //appending the html tag here for creating the tool tip adding here instead of index.html please do look for tag here
+        vis.tooltip = d3.select('body').append('div')
+        .attr('class', 'tooltip')
+        .style('opacity', 0)
+        .style('position', 'absolute')
+        .style('pointer-events', 'none')
+        .style('background-color', 'white')
+        .style('border', '1px solid black')
+        .style('padding', '5px');
     }
 
     updateVis() {
@@ -55,7 +65,7 @@ class ScatterPlot {
         vis.xScale.domain([0, d3.max(vis.data, vis.xValue)]);
         vis.yScale.domain([0, d3.max(vis.data, vis.yValue)]);
 
-        const specifiedAttributes = ['Savanna fires', 'Rice Cultivation', 'Food Household Consumption', 'On-farm Electricity Use', 'Food Processing'];
+        const specifiedAttributes = ['Savanna fires', 'Rice Cultivation', 'Food Household Consumption', 'On-farm Electricity Use', 'Food Processing','Agrifood Systems Waste Disposal','Pesticides Manufacturing'];
         const dropdown = document.getElementById('attribute-selector');
         dropdown.innerHTML = '';  
         specifiedAttributes.forEach(attr => {
@@ -76,13 +86,17 @@ class ScatterPlot {
     updateData(attribute) {
         let vis = this;
 
-        // Update xValue function to reflect the new attribute
+       
         vis.xValue = d => d[attribute];
 
-        // Recalculating  domain based on new data
+        // here we are updating the above intialized current attribute to make it dynamic in tool tip 
+
+        vis.currentAttribute = attribute;
+
+       
         vis.xScale.domain([0, d3.max(vis.data, vis.xValue)]);
         
-        // Update the chart
+        
         vis.renderVis();
     }
 
@@ -96,7 +110,37 @@ class ScatterPlot {
             .attr('r', 4)
             .attr('cx', d => vis.xScale(vis.xValue(d)))
             .attr('cy', d => vis.yScale(vis.yValue(d)))
-            .attr('fill', d => vis.colorScale(vis.colorValue(d)));
+            .attr('fill', d => vis.colorScale(vis.colorValue(d)))
+            //adding the highilghting function for each bubble in scatter plot  and adding the tool tip as well 
+            .on('mouseover', function(event, d) {
+                d3.select(this)
+                    .transition()
+                    .duration(150)
+                    .attr('r', 8)  
+                    .attr('stroke', 'black')
+                    .attr('stroke-width', 1.5);
+                    vis.tooltip.transition()
+                    .duration(200)
+                    .style('opacity', 1);
+                    //in this function tool tip is intialized and displayed as per the mouse coordinates it is based on the mouse coordinates which is written as event page in above code 
+                vis.tooltip.html(`Area: ${d.Area}<br>${vis.currentAttribute.replace(/_/g, ' ')}: ${d[vis.currentAttribute]}<br>Rural Population: ${d['Rural population']}<br>Urban Population: ${d['Urban population']}`)
+                    .style('left', (event.pageX + 10) + 'px')
+                    .style('top', (event.pageY - 28) + 'px');
+                })
+            .on('mouseout', function() {
+                d3.select(this)
+                    .transition()
+                    .duration(150)
+                    .attr('r', 4)  
+                    .attr('stroke', 'none');
+                    vis.tooltip.transition()
+                    .duration(500)
+                    .style('opacity', 0);
+                });
+            
+            
+           
+           
 
         vis.xAxisG.call(vis.xAxis).call(g => g.select('.domain').remove());
         vis.yAxisG.call(vis.yAxis).call(g => g.select('.domain').remove());
