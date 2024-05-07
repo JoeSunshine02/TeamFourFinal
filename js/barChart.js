@@ -164,6 +164,8 @@ class BarChart {
                     .style('left', (event.pageX + 10) + 'px')
                     .style('top', (event.pageY - 28) + 'px');
                 
+                    d3.selectAll('.point')
+                    .style('fill-opacity', bar => bar.Area === d.Area ? 1 : 0.1);
         
                 })
                
@@ -172,6 +174,7 @@ class BarChart {
                     vis.tooltip.transition()
                     .duration(500)
                     .style('opacity', 0);
+                    d3.selectAll('.point').style('fill-opacity', 1);
                 });
         });
        
