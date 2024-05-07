@@ -9,8 +9,8 @@ class BarChart {
         this.config = {
             parentElement: _config.parentElement,
             containerWidth: _config.containerWidth || 900,
-            containerHeight: _config.containerHeight || 200,
-            margin: _config.margin || {top: 5, right: 5, bottom: 20, left: 50}
+            containerHeight: _config.containerHeight || 250,
+            margin: _config.margin || {top: 5, right: 5, bottom: 20, left: 40}
         };
         this.data = _data;
         this.colorScale= d3.scaleOrdinal(d3.schemeCategory10);
@@ -60,9 +60,22 @@ class BarChart {
 
         vis.svg.append('text')
             .attr('class', 'axis-title')
-            .attr('x', 0)
+            .attr('x', 0+60)
             .attr('y', 0)
             .attr('dy', '.71em')
+            .text('Avg Value');
+
+
+
+
+        vis.tooltip = d3.select('body').append('div')
+        .attr('class', 'tooltip')
+        .style('opacity', 0)
+        .style('position', 'absolute')
+        .style('pointer-events', 'none')
+        .style('background-color', 'white')
+        .style('border', '1px solid black')
+        .style('padding', '5px');
 
     }
 
@@ -139,11 +152,26 @@ class BarChart {
                     .style('stroke-opacity', lineData => lineData.Area === d.key ? 1 : 0.1);
                     d3.select(this).attr('stroke', 'black') 
                     .attr('stroke-width', 2); 
+                    vis.tooltip.transition()
+                    .duration(200)
+                    .style('opacity', 1);
+                    //in this function tool tip is intialized and displayed as per the mouse coordinates it is based on the mouse coordinates which is written as event page in above code 
+                vis.tooltip.html(`
+                    Area: ${d.Area}<br>
+                    Category: ${category}<br>
+                    Average Value: ${d[category].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`)
+
+                    .style('left', (event.pageX + 10) + 'px')
+                    .style('top', (event.pageY - 28) + 'px');
+                
         
                 })
                
                 .on('mouseout', function() {
                     d3.select(this).attr('stroke-width', '0px');
+                    vis.tooltip.transition()
+                    .duration(500)
+                    .style('opacity', 0);
                 });
         });
        

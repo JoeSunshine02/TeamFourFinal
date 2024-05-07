@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
             d["Forest fires"] = +d["Forest fires"];
             d["Rice Cultivation"] = +d["Rice Cultivation"];
             d["Pesticides Manufacturing"] = +d["Pesticides Manufacturing"];
+            //d.Year = parseFloat(d.Year);
             d.Year = new Date(d.Year, 0);  // Convert year to date object for the x-axis
         });
 

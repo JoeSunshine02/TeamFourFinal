@@ -2,7 +2,7 @@ class ScatterPlot {
     constructor(_config, _data, _colorScale) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: _config.containerWidth || 500,
+            containerWidth: _config.containerWidth || 600,
             containerHeight: _config.containerHeight || 600,
             margin: _config.margin || {top: 25, right: 80, bottom: 80, left: 80},
             tooltipPadding: _config.tooltipPadding || 15
@@ -31,6 +31,7 @@ class ScatterPlot {
             .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
         
         vis.xScale = d3.scaleLinear().range([0, vis.width]);
+            
         vis.yScale = d3.scaleLinear().range([vis.height, 0]);
 
         vis.xAxis = d3.axisBottom(vis.xScale)
@@ -43,8 +44,18 @@ class ScatterPlot {
         vis.xAxisG = vis.chart.append('g').attr('class', 'axis x-axis').attr('transform', `translate(0,${vis.height})`);
         vis.yAxisG = vis.chart.append('g').attr('class', 'axis y-axis');
 
-        vis.svg.append('text').attr('class', 'axis-title').attr('x', 0).attr('y', 25).attr('dy', '0.71em').text('Rural Population');
-        vis.chart.append('text').attr('class', 'axis-title').attr('x', vis.width).attr('y', vis.height - 15).attr('dy', '0.71em').style('text-anchor', 'end').text('selected attribute');
+        vis.svg.append('text')
+        .attr('class', 'axis-title')
+        .attr('x', 0).attr('y', 25)
+        .attr('dy', '0.71em')
+        .text('Urban Population');
+
+        vis.chart.append('text')
+        .attr('class', 'axis-title')
+        .attr('x', vis.width).attr('y', vis.height - 15)
+        .attr('dy', '0.71em').style('text-anchor', 'end')
+        .text(vis.currentAttribute);
+
         //appending the html tag here for creating the tool tip adding here instead of index.html please do look for tag here
         vis.tooltip = d3.select('body').append('div')
         .attr('class', 'tooltip')
@@ -92,10 +103,15 @@ class ScatterPlot {
         // here we are updating the above intialized current attribute to make it dynamic in tool tip 
 
         vis.currentAttribute = attribute;
+        vis.chart.selectAll('.axis-title').remove();
 
-       
+        vis.chart.append('text')
+        .attr('class', 'axis-title')
+        .attr('x', vis.width).attr('y', vis.height - 15)
+        .attr('dy', '0.71em').style('text-anchor', 'end')
+        .text(vis.currentAttribute);
+
         vis.xScale.domain([0, d3.max(vis.data, vis.xValue)]);
-        
         
         vis.renderVis();
     }
@@ -104,7 +120,7 @@ class ScatterPlot {
         let vis = this;
         
         const bubbles = vis.chart.selectAll('.point')
-            .data(vis.data)
+        .data(vis.data)
             .join('circle')
             .attr('class', 'point')
             .attr('r', 4)
@@ -123,7 +139,13 @@ class ScatterPlot {
                     .duration(200)
                     .style('opacity', 1);
                     //in this function tool tip is intialized and displayed as per the mouse coordinates it is based on the mouse coordinates which is written as event page in above code 
-                vis.tooltip.html(`Area: ${d.Area}<br>${vis.currentAttribute.replace(/_/g, ' ')}: ${d[vis.currentAttribute]}<br>Rural Population: ${d['Rural population']}<br>Urban Population: ${d['Urban population']}`)
+                vis.tooltip.html(`
+                    Area: ${d.Area}<br>
+                    ${vis.currentAttribute.replace(/_/g, ' ')}: ${d[vis.currentAttribute]}<br>
+                    Rural Population: ${d['Rural population'].toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 2})}<br>
+                    Urban Population: ${d['Urban population']}<br>
+                    Year: ${d['Year']}`)
+
                     .style('left', (event.pageX + 10) + 'px')
                     .style('top', (event.pageY - 28) + 'px');
                 })
@@ -137,12 +159,32 @@ class ScatterPlot {
                     .duration(500)
                     .style('opacity', 0);
                 });
-            
-            
-           
-           
-
+                
         vis.xAxisG.call(vis.xAxis).call(g => g.select('.domain').remove());
         vis.yAxisG.call(vis.yAxis).call(g => g.select('.domain').remove());
+
+        // Appending legend group
+    vis.legend = vis.svg.append('g')
+    .attr('class', 'legend')
+    .attr('transform', `translate(${vis.width - 100},${vis.config.margin.top})`);
+
+// Appending legend labels and colors
+vis.colorScale.domain().forEach((area, i) => {
+    let legendItem = vis.legend.append('g')
+        .attr('class', 'legend-item')
+        .attr('transform', `translate(0,${i * 20})`);
+
+    legendItem.append('rect')
+        .attr('width', 10)
+        .attr('height', 10)
+        .attr('fill', vis.colorScale(area));
+
+    legendItem.append('text')
+        .attr('x', 15)
+        .attr('y', 7)
+        .text(area);
+});
+
+        
     }
 }

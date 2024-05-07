@@ -1,16 +1,23 @@
 .container {
     display: flex;
+    width: 100%;
 }
 
 .left-column {
-    flex: left;
-    margin-right: 20px; /* Adjust as needed */
-    width: 70%;
+    width: 60%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
 }
 
 .right-column {
-    flex: right;
-    width: 30%;
+    width: 40%;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+
 }
 #lineChart, .bar-chart {
     
@@ -27,4 +34,14 @@
 .scatterplot {
     
     margin-bottom: 10px; /* Adjust as needed */
+}
+@media screen and (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .left-column, .right-column {
+        width: 100%;
+        position: static;
+    }
 }
