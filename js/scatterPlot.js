@@ -148,6 +148,9 @@ class ScatterPlot {
                     Year: ${d['Year']}`)
                     .style('left', (event.pageX + 10) + 'px')
                     .style('top', (event.pageY - 28) + 'px');
+                    //highlighting the bar in the bar chart 
+                d3.selectAll('.bar')
+                .style('fill-opacity', bar => bar.Area === d.Area ? 1 : 0.1);
             })
             .on('mouseout', function () {
                 d3.select(this)
@@ -158,6 +161,9 @@ class ScatterPlot {
                 vis.tooltip.transition()
                     .duration(500)
                     .style('opacity', 0);
+
+                d3.selectAll('.bar').style('fill-opacity', 1);
+                
             });
 
         // Update axes with ticks and lines
