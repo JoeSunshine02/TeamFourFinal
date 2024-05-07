@@ -2,8 +2,8 @@ class MultiLineChart {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: _config.containerWidth || 90,
-            containerHeight: _config.containerHeight || 500,
+            containerWidth: _config.containerWidth || 600,
+            containerHeight: _config.containerHeight || 400,
             margin: _config.margin || { top: 50, right: 50, bottom: 50, left: 50 }
         };
         this.fullData = _data;
@@ -51,15 +51,20 @@ class MultiLineChart {
         // Group for lines and tooltips
         vis.marksG = vis.chartG.append('g');
 
-        // Tooltip setup
+        // Single tooltip setup
         vis.tooltip = d3.select('body').append('div')
             .attr('class', 'tooltip')
-            .style('opacity', 0);
+            .style('opacity', 0)
+            .style('position', 'absolute')
+            .style('pointer-events', 'none')
+            .style('background-color', 'white')
+            .style('border', '1px solid black')
+            .style('padding', '5px');
 
-        // Add a legend group
+        // Add a legend group, adjust the x-coordinate to move left
         vis.legendG = vis.svg.append('g')
             .attr('class', 'legend')
-            .attr('transform', `translate(${vis.width - 150}, 30)`);
+            .attr('transform', `translate(${vis.width - 280}, 30)`); // Adjust the x-coordinate for desired positioning
 
         // Initially, all lines are shown
         vis.activeLines = {};
@@ -100,19 +105,24 @@ class MultiLineChart {
             .attr('stroke-width', 1.5)
             .attr('d', d => lineGenerator(d)(vis.data))
             .on('mouseover', function (event, d) {
-                d3.select(this).attr('stroke-width', 3); // Highlight the line
+                d3.select(this)
+                    .transition().duration(200)
+                    .attr('stroke-width', 3); // Highlight the line
                 vis.tooltip.transition().duration(200).style('opacity', 0.9);
-                vis.tooltip.html(`<strong>${d}</strong>`)
+                vis.tooltip.html(`<strong>SelectedAttribute: ${d}</strong>`)
                     .style('left', (event.pageX + 5) + 'px')
                     .style('top', (event.pageY - 28) + 'px');
             })
             .on('mouseout', function () {
-                d3.select(this).attr('stroke-width', 1.5); // Revert to normal width
+                d3.select(this)
+                    .transition().duration(200)
+                    .attr('stroke-width', 1.5); // Revert to normal width
                 vis.tooltip.transition().duration(500).style('opacity', 0);
             })
             .on('click', function () {
-                d3.selectAll('.line').attr('stroke-opacity', 0.2); // Dim all lines
-                d3.select(this).attr('stroke-opacity', 1).attr('stroke-width', 3); // Highlight clicked line
+                // Dim all lines and highlight the clicked line
+                d3.selectAll('.line').attr('stroke-opacity', 0.2);
+                d3.select(this).attr('stroke-opacity', 1).attr('stroke-width', 3);
             });
 
         // Remove old lines
@@ -138,7 +148,7 @@ class MultiLineChart {
             .attr('opacity', d => (vis.activeLines[d] ? 1 : 0.2));
 
         legendEnter.append('text')
-            .attr('x', 24)
+            .attr('x', 24) // Adjust as needed
             .attr('y', 9)
             .attr('dy', '0.35em')
             .text(d => d);
