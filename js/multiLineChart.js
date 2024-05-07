@@ -2,9 +2,9 @@ class MultiLineChart {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: _config.containerWidth || 90,
+            containerWidth: _config.containerWidth || 900,
             containerHeight: _config.containerHeight || 500,
-            margin: _config.margin || { top: 50, right: 50, bottom: 50, left: 50 }
+            margin: _config.margin || { top: 25, right: 50, bottom: 50, left: 50 }
         };
         this.fullData = _data;
         this.data = [];
