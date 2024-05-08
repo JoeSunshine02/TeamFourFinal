@@ -2,7 +2,7 @@ class ScatterPlot {
     constructor(_config, _data, _colorScale) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: _config.containerWidth || 600,
+            containerWidth: _config.containerWidth || 500,
             containerHeight: _config.containerHeight || 600,
             margin: _config.margin || { top: 25, right: 80, bottom: 80, left: 80 },
             tooltipPadding: _config.tooltipPadding || 15
@@ -56,10 +56,12 @@ class ScatterPlot {
             .text('Urban Population');
         vis.chart.append('text')
             .attr('class', 'axis-title')
-            .attr('x', vis.width).attr('y', vis.height - 15)
-            .attr('dy', '0.71em').style('text-anchor', 'end')
+            .attr('x', vis.width)
+            .attr('y', vis.height - 15)
+            .attr('dy', '0.71em')
+            .style('text-anchor', 'end')
             .text(vis.currentAttribute);
-
+        
         // Tooltip setup
         vis.tooltip = d3.select('body').append('div')
             .attr('class', 'tooltip')
@@ -178,7 +180,7 @@ class ScatterPlot {
         vis.colorScale.domain().forEach((area, i) => {
             let legendItem = vis.legend.append('g')
                 .attr('class', 'legend-item')
-                .attr('transform', `translate(0,${i * 20})`);
+                .attr('transform', `translate(155,${i * 20})`);
 
             legendItem.append('rect')
                 .attr('width', 10)

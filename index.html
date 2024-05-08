@@ -5,31 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team 4 final</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Freeman&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>C02 producers by nation.</h1>
-
-    
-
+    <div class="header">
+        <h1>C02 Production from Country around the World.</h1>
+    </div>
     <div class="container">
         <div class="left-column">
-            <!-- Dropdown for selecting the country -->
-            <div style="text-align: center; margin-bottom: 20px;">
-                <label for="country-selector">Select Country:</label>
-                <select id="country-selector" style="margin-left: 10px;"></select>
-            </div>
-            <h1 style="text-align: center;">CO2 Emissions Dashboard</h1>
-            <!-- Todo: add a title for the dashboard using h1 tag -->
-            <div id="lineChart" style="width: 960px; height: 500px; margin: auto;"></div>
-            <div id="tooltip" class="tooltip" style="opacity: 0;"></div>
-            <div class="bar-chart"></div>
-        </div>
-        <div class="right-column">
-            <div style="text-align: center; margin-bottom: 20px;">
+            <div class = " selctor">
                 <label for="attribute selector">Select attribute:</label>
-                <select id="attribute-selector" style="margin-left: 10px;"></select>
+                <select id="attribute-selector"></select>
             </div>
             <div class="scatterplot"></div>
+        </div>
+        <div class="right-column">
+            <div class="bar-chart"></div>
+            <div class ="selector">
+                <label for="country-selector">Select Country:</label>
+                <select id="country-selector" ></select>
+            </div>
+            <div id="lineChart"></div>
+        </div>
+        <div class="bottom-box">
+            
         </div>
    </div>
    
