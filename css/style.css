@@ -1,3 +1,6 @@
+body{
+    font-family: "Freeman", sans-serif;
+}
 .container {
     display: flex;
     flex-wrap: wrap;
@@ -34,5 +37,21 @@
     margin-bottom: 10px; /* Adjust as needed */
 }
 h1{
+    font-family: "Freeman", sans-serif;
     text-align: center;
+}
+.freeman-regular {
+    font-family: "Freeman", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+.header{
+    background-color: #77c3ad;
+    color: white;
+    padding: 25px;
+    text-align: center;
+    width: 100%;
+    top: 0;
+    left: 0;
+    margin-bottom: 10px;
 }

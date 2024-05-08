@@ -56,10 +56,12 @@ class ScatterPlot {
             .text('Urban Population');
         vis.chart.append('text')
             .attr('class', 'axis-title')
-            .attr('x', vis.width).attr('y', vis.height - 15)
-            .attr('dy', '0.71em').style('text-anchor', 'end')
+            .attr('x', vis.width)
+            .attr('y', vis.height - 15)
+            .attr('dy', '0.71em')
+            .style('text-anchor', 'end')
             .text(vis.currentAttribute);
-
+        
         // Tooltip setup
         vis.tooltip = d3.select('body').append('div')
             .attr('class', 'tooltip')
@@ -178,7 +180,7 @@ class ScatterPlot {
         vis.colorScale.domain().forEach((area, i) => {
             let legendItem = vis.legend.append('g')
                 .attr('class', 'legend-item')
-                .attr('transform', `translate(0,${i * 20})`);
+                .attr('transform', `translate(155,${i * 20})`);
 
             legendItem.append('rect')
                 .attr('width', 10)
