@@ -68,7 +68,7 @@ class ScatterPlot {
             .style('opacity', 0)
             .style('position', 'absolute')
             .style('pointer-events', 'none')
-            .style('background-color', 'white')
+            //.style('background-color', '#77c3ad')
             .style('border', '1px solid black')
             .style('padding', '5px');
     }
@@ -148,8 +148,11 @@ class ScatterPlot {
                     Rural Population: ${d['Rural population'].toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}<br>
                     Urban Population: ${d['Urban population']}<br>
                     Year: ${d['Year']}`)
+                    //console.log(vis.colorValue(d))
                     .style('left', (event.pageX + 10) + 'px')
-                    .style('top', (event.pageY - 28) + 'px');
+                    .style('top', (event.pageY - 28) + 'px')
+                    .style('background-color', vis.colorScale(vis.colorValue(d)))
+                    .style('color', 'white');
                     //highlighting the bar in the bar chart 
                 d3.selectAll('.bar')
                 .style('fill-opacity', bar => bar.Area === d.Area ? 1 : 0.1);

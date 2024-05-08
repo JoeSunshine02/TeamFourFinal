@@ -162,7 +162,9 @@ class BarChart {
                     Average Value: ${d[category].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`)
 
                     .style('left', (event.pageX + 10) + 'px')
-                    .style('top', (event.pageY - 28) + 'px');
+                    .style('top', (event.pageY - 28) + 'px')
+                    .style('background-color', vis.colorScale(category))
+                    .style('color', 'white');
                 
                     d3.selectAll('.point')
                     .style('fill-opacity', bar => bar.Area === d.Area ? 1 : 0.1);

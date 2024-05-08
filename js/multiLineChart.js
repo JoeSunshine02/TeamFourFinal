@@ -111,7 +111,9 @@ class MultiLineChart {
                 vis.tooltip.transition().duration(200).style('opacity', 0.9);
                 vis.tooltip.html(`<strong>SelectedAttribute: ${d}</strong>`)
                     .style('left', (event.pageX + 5) + 'px')
-                    .style('top', (event.pageY - 28) + 'px');
+                    .style('top', (event.pageY - 28) + 'px')
+                    .style('background-color',vis.colorScale(d))
+                    .style('color', 'white');
             })
             .on('mouseout', function () {
                 d3.select(this)
